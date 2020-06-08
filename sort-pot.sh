@@ -6,8 +6,8 @@ if [[ $KEY == "" ]]; then
 	printf "(You can also define your user key as a variable in this script)\n"
 	exit
 else
-	if test -f "current.pot"; then
-	printf "Potfile current.pot already exists, it will be renamed to old.pot and a new one will be downloaded.\n"
+	if test -f "current.potfile"; then
+	printf "Potfile current.pot already exists, it will be renamed to old.potfile and a new one will be downloaded.\n"
 	printf "Backing up existing old.potfile and renaming current.potfile to old.potfile"
 	TEMPDATE=$(date -r old.potfile "+%Y-%d-%m_%H-%M-%S")
 	mkdir -p archive
