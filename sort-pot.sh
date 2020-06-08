@@ -6,9 +6,26 @@ if [[ KEY == "" ]]; then
 	printf "(You can also define your user key as a variable in this script)\n"
 	exit
 else
+	if test -f "current.pot"; then
+	printf "Potfile current.pot already exists, it will be renamed to old.pot and a new one will be downloaded.\n"
+	printf "Backing up existing old.potfile and renaming current.potfile to old.potfile"
+	TEMPDATE=$(date -r old.potfile "+%Y-%d-%m_%H-%M-%S")
+	mkdir -p archive
+	mv old.potfile archive/$TEMPDATE-old.potfile
+	mv current.potfile old.potfile
 	printf "Downloading potfile...\n"
 	./get-pot.sh "$KEY" > temp-pot.txt
 	printf "Saving cracked handshakes to current.potfile...\n"
 	cat temp-pot.txt | sort | uniq -u -w 12 | cut -d ":" -f 1,3,4 > current.potfile
-	#rm temp-pot.txt
+	rm temp-pot.txt
+	printf "Comparing old and new potfiles and saving to newsites.txt\n"
+	diff -u old.potfile current.potfile | grep -E "^\+" | tail -n +2 | tr -d "+" > newsites.txt
+	fi
+else
+	printf "No existing potfiles detected. Current one will get downloaded and saved to current.potfile\n"
+	printf "Downloading potfile...\n"
+	./get-pot.sh "$KEY" > temp-pot.txt
+	printf "Saving cracked handshakes to current.potfile...\n"
+	cat temp-pot.txt | sort | uniq -u -w 12 | cut -d ":" -f 1,3,4 > current.potfile
+	rm temp-pot.txt
 fi
