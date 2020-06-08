@@ -1,7 +1,7 @@
 #!/bin/bash
 KEY="$1"
 
-if [[ KEY == "" ]]; then
+if [[ $KEY == "" ]]; then
 	printf "Usage: $0 you-wpa-sec-key\n"
 	printf "(You can also define your user key as a variable in this script)\n"
 	exit
