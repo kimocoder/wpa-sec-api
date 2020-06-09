@@ -16,7 +16,7 @@ else
 	printf "Downloading potfile...\n"
 	./get-pot.sh "$KEY" > temp-pot.txt
 	printf "Saving cracked handshakes to current.potfile...\n"
-	cat temp-pot.txt | sort | uniq -u -w 12 | cut -d ":" -f 1,3,4 > current.potfile
+	cat temp-pot.txt | sort | uniq -w 12 | cut -d ":" -f 1,3,4 > current.potfile
 	rm temp-pot.txt
 	printf "Comparing old and new potfiles and saving to newsites.txt\n"
 	diff -u old.potfile current.potfile | grep -E "^\+" | tail -n +2 | tr -d "+" > newsites.txt
@@ -25,7 +25,7 @@ else
 	printf "Downloading potfile...\n"
 	./get-pot.sh "$KEY" > temp-pot.txt
 	printf "Saving cracked handshakes to current.potfile...\n"
-	cat temp-pot.txt | sort | uniq -u -w 12 | cut -d ":" -f 1,3,4 > current.potfile
+	cat temp-pot.txt | sort | uniq -w 12 | cut -d ":" -f 1,3,4 > current.potfile
 	rm temp-pot.txt
 	fi
 fi
