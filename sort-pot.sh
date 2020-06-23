@@ -9,7 +9,7 @@ else
 	if test -f "current.potfile"; then
 	printf "Potfile current.pot already exists, it will be renamed to old.potfile and a new one will be downloaded.\n"
 	printf "Backing up existing old.potfile and renaming current.potfile to old.potfile\n"
-	TEMPDATE=$(date -r old.potfile "+%Y-%d-%m_%H-%M-%S")
+	TEMPDATE=$(date -r old.potfile "+%Y-%m-%d_%H-%M-%S")
 	mkdir -p archive
 	mv old.potfile archive/$TEMPDATE-old.potfile
 	mv current.potfile old.potfile
