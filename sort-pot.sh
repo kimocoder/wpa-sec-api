@@ -1,30 +1,26 @@
 #!/bin/bash
-KEY="$1"
+source creds.txt
 
-if [[ $KEY == "" ]]; then
-	printf "Usage: $0 you-wpa-sec-key\n"
-	printf "(You can also define your user key as a variable in this script)\n"
+if [[ $WPASECKEY == "" ]]; then
+	echo -e -e "\e[91mERROR\e[0m: No wpa-sec key supplied. Enter your key into creds.txt"
 	exit
 else
 	if test -f "current.potfile"; then
-	printf "Potfile current.pot already exists, it will be renamed to old.potfile and a new one will be downloaded.\n"
-	printf "Backing up existing old.potfile and renaming current.potfile to old.potfile\n"
-	TEMPDATE=$(date -r old.potfile "+%Y-%m-%d_%H-%M-%S")
-	mkdir -p archive
-	mv old.potfile archive/$TEMPDATE-old.potfile
+		if test -f "old.potfile"; then
+			mkdir -p archive
+			TEMPDATE=$(date -r old.potfile "+%Y-%m-%d_%H-%M-%S")
+			mv old.potfile archive/$TEMPDATE-old.potfile
+		fi
+	echo -e "\e[92m\e[1mcurrent.pot\e[0m\e[92m exists, downloading new sites\e[0m"
 	mv current.potfile old.potfile
-	printf "Downloading potfile...\n"
 	./get-pot.sh "$KEY" > temp-pot.txt
-	printf "Saving cracked handshakes to current.potfile...\n"
 	cat temp-pot.txt | sort | uniq -w 12 | cut -d ":" -f 1,3,4 > current.potfile
 	rm temp-pot.txt
-	printf "Comparing old and new potfiles and saving to newsites.txt\n"
+	test -f "old.potfile"
 	diff -ua old.potfile current.potfile | grep -Ea "^\+" | tail -n +2 | tr -d "+" > newsites.txt
 	else
-	printf "No existing potfiles detected. Current one will get downloaded and saved to current.potfile\n"
-	printf "Downloading potfile...\n"
+	echo -e "\e[33mNo previous potfiles detected, downloading sites\e[0m"
 	./get-pot.sh "$KEY" > temp-pot.txt
-	printf "Saving cracked handshakes to current.potfile...\n"
 	cat temp-pot.txt | sort | uniq -w 12 | cut -d ":" -f 1,3,4 > current.potfile
 	rm temp-pot.txt
 	fi
