@@ -30,26 +30,30 @@ fi
 
 save_file ()
 {
-echo "Saving to $FILENAME..."
-cat "$1" | while read -r line
-do
-	FILEMAC=$(echo "$line" | cut -d ":" -f 1)
-	PSK=$(echo "$line" | cut -d ":" -f 3)
-	SSID=$(echo "$line" | cut -d ":" -f 2)
-	PARSEDMAC=$(echo "$FILEMAC" | sed -e 's/[0-9A-Fa-f]\{2\}/&:/g' -e 's/:$//')
-	APICONTENT=$(curl -s -H 'Accept:application/json' -u $WIGLEAPINAME:$WIGLEAPIKEY --basic "https://api.wigle.net/api/v2/network/detail?netid=$PARSEDMAC")
-	if ( echo "$APICONTENT" | grep 'too many queries today' ); then
-		echo -e "\e[91mERROR\e[0m: API query limit reached"
-		exit
-	fi
-	if ( echo "$APICONTENT" | grep '{"success":false,' > /dev/null ); then
-		echo "null;null;$PARSEDMAC;$SSID;$PSK" >> $FILENAME
-	else
-		WIGLETRILAT=$(echo "$APICONTENT" | jq '.results[0].trilat')
-		WIGLETRILONG=$(echo "$APICONTENT" | jq '.results[0].trilong')
-		echo "$WIGLETRILAT;$WIGLETRILONG;$PARSEDMAC;$SSID;$PSK" >> $FILENAME
-	fi
-done
+	WC_LINES=$(wc -l $1 | cut -d " " -f 1)
+	CURRENT_LINE=1
+	cat "$1" | while read -r line
+	do
+		echo -e "\e[1A\e[KSaving networks to $FILENAME... ($CURRENT_LINE/$WC_LINES)"
+		FILEMAC=$(echo "$line" | cut -d ":" -f 1)
+		PSK=$(echo "$line" | cut -d ":" -f 3)
+		SSID=$(echo "$line" | cut -d ":" -f 2)
+		PARSEDMAC=$(echo "$FILEMAC" | sed -e 's/[0-9A-Fa-f]\{2\}/&:/g' -e 's/:$//')
+		APICONTENT=$(curl -s -H 'Accept:application/json' -u $WIGLEAPINAME:$WIGLEAPIKEY --basic "https://api.wigle.net/api/v2/network/detail?netid=$PARSEDMAC")
+		if ( echo "$APICONTENT" | grep 'too many queries today' ); then
+			echo -e "\e[91mERROR\e[0m: API query limit reached"
+			exit
+		fi
+		if ( echo "$APICONTENT" | grep '{"success":false,' > /dev/null ); then
+			echo "null;null;$PARSEDMAC;$SSID;$PSK" >> $FILENAME
+			((CURRENT_LINE=$CURRENT_LINE+1))
+		else
+			WIGLETRILAT=$(echo "$APICONTENT" | jq '.results[0].trilat')
+			WIGLETRILONG=$(echo "$APICONTENT" | jq '.results[0].trilong')
+			echo "$WIGLETRILAT;$WIGLETRILONG;$PARSEDMAC;$SSID;$PSK" >> $FILENAME
+			((CURRENT_LINE=$CURRENT_LINE+1))
+		fi
+	done
 }
 
 if test -f "$FILENAME"; then
