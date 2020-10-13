@@ -1,6 +1,6 @@
 #!/bin/bash
 source creds.txt
-VERSION="v1.1"
+VERSION="v1.1-git"
 
 
 echo "wpa-sec-api $VERSION by Czechball"
