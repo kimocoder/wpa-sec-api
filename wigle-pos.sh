@@ -3,7 +3,7 @@
 # This script is used to process the newsites.txt or other potfiles outputted by sort-pot.sh
 
 source creds.txt
-VERSION="v1.1-git"
+VERSION="v1.1"
 
 echo "wpa-sec-api $VERSION by Czechball"
 if [[ $WIGLEAPINAME == "" ]]; then

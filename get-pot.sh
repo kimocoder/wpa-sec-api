@@ -1,6 +1,6 @@
 #!/bin/bash
 source creds.txt
-VERSION="v1.1-git"
+VERSION="v1.1"
 
 if [[ $WPASECKEY == "" ]]; then
 	echo -e "\e[91mERROR\e[0m: No wpa-sec key supplied. Enter your key into creds.txt"
