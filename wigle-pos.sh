@@ -3,7 +3,9 @@
 # This script is used to process the newsites.txt or other potfiles outputted by sort-pot.sh
 
 source creds.txt
+VERSION="v1.1"
 
+echo "wpa-sec-api $VERSION by Czechball"
 if [[ $WIGLEAPINAME == "" ]]; then
 	echo -e "\e[91mERROR\e[0m: Wigle API Name is missing. You can get it from https://wigle.net/account"
 	echo "Enter your credentials into creds.txt"
