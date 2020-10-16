@@ -13,11 +13,10 @@ if [[ $* == "" ]]; then
 	exit
 fi
 
-while getopts ":f:d:h:" arg; do
+while getopts ":f:d:" arg; do
   case $arg in
     f) FILE=$OPTARG;;
     d) DIRECTORY=$OPTARG;;
-	h) HELP=1;;
   esac
 done
 
