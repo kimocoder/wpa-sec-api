@@ -32,6 +32,7 @@ fi
 
 save_file ()
 {
+	echo
 	WC_LINES=$(wc -l $1 | cut -d " " -f 1)
 	CURRENT_LINE=1
 	cat "$1" | while read -r line
