@@ -33,7 +33,7 @@ wigle-pos.sh is used to geolocate cracked networks using Wigle.net. It will outp
 ```
 lat;long;bssid;essid;psk
 ```
-Please note that this script can potentionally break is essid or psk contains unsafe characters.  
+Please note that this script can potentionally break if essid or psk contains unsafe characters.  
 Usage:
 ```sh
 ./wigle-pos.sh newsites.txt
