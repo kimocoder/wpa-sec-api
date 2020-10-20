@@ -1,5 +1,5 @@
 #!/bin/bash
-source creds.txt
+source ./creds.txt
 HELP=0
 VERSION="v1.1"
 
