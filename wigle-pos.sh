@@ -30,6 +30,12 @@ if [[ $1 == "" ]]; then
 	exit
 fi
 
+if [[ $2 == "" ]]; then
+	:
+else
+	FILENAME=$2
+fi
+
 save_file ()
 {
 	echo
