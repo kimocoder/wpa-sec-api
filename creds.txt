@@ -1,7 +1,8 @@
-WPASECKEY=""
+#!/bin/bash
+export WPASECKEY=""
 
 # Get your API name and API key from https://wigle.net/account
 
-NICK=""
-WIGLEAPINAME=""
-WIGLEAPIKEY=""
+export NICK=""
+export WIGLEAPINAME=""
+export WIGLEAPIKEY=""
