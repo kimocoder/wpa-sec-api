@@ -1,6 +1,6 @@
 #!/bin/bash
 source ./creds.txt
-VERSION="v1.1"
+VERSION="v1.2"
 
 if ping "wpa-sec.stanev.org" -c 1 -w 5 > /dev/null; then
 	:
