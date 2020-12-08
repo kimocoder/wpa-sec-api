@@ -4,6 +4,13 @@ VERSION="v1.1"
 
 echo "wpa-sec-api $VERSION by Czechball"
 
+if ping "wpa-sec.stanev.org" -c 1 -w 5 > /dev/null; then
+	:
+else
+	echo -e "\e[91mERROR\e[0m: wpa-sec.stanev.org couldn't be reached, check your internet connection"
+	exit
+fi
+
 if [[ $1 == "" ]]; then
 	if [[ $WPASECKEY == "" ]]; then
 		echo -e "\e[91mERROR\e[0m: No wpa-sec key supplied. Enter your key into creds.txt"
