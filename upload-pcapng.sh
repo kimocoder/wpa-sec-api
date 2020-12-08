@@ -1,7 +1,9 @@
 #!/bin/bash
-source ./creds.txt
 VERSION="v1.2"
 FILENAMES="*.pcapng*"
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+
+source "$SCRIPTPATH"/creds.txt
 
 while getopts "d:h?:*:" arg; do
 	case ${arg} in

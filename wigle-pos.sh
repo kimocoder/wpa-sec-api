@@ -2,8 +2,10 @@
 
 # This script is used to process the newsites.txt or other potfiles outputted by sort-pot.sh
 
-source ./creds.txt
 VERSION="v1.2"
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+
+source "$SCRIPTPATH"/creds.txt
 
 echo "wpa-sec-api $VERSION by Czechball"
 if [[ $WIGLEAPINAME == "" ]]; then
