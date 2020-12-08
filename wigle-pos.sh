@@ -39,7 +39,7 @@ fi
 save_file ()
 {
 	echo
-	WC_LINES=$(wc -l $1 | cut -d " " -f 1)
+	WC_LINES=$(wc -l "$1" | cut -d " " -f 1)
 	CURRENT_LINE=1
 	cat "$1" | while read -r line
 	do
@@ -54,13 +54,13 @@ save_file ()
 			exit
 		fi
 		if ( echo "$APICONTENT" | grep '{"success":false,' > /dev/null ); then
-			echo "null;null;$PARSEDMAC;$SSID;$PSK" >> $FILENAME
-			((CURRENT_LINE=$CURRENT_LINE+1))
+			echo "null;null;$PARSEDMAC;$SSID;$PSK" >> "$FILENAME"
+			((CURRENT_LINE=CURRENT_LINE+1))
 		else
 			WIGLETRILAT=$(echo "$APICONTENT" | jq '.results[0].trilat')
 			WIGLETRILONG=$(echo "$APICONTENT" | jq '.results[0].trilong')
-			echo "$WIGLETRILAT;$WIGLETRILONG;$PARSEDMAC;$SSID;$PSK" >> $FILENAME
-			((CURRENT_LINE=$CURRENT_LINE+1))
+			echo "$WIGLETRILAT;$WIGLETRILONG;$PARSEDMAC;$SSID;$PSK" >> "$FILENAME"
+			((CURRENT_LINE=CURRENT_LINE+1))
 		fi
 	done
 }
