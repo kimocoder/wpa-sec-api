@@ -5,6 +5,13 @@ SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 source "$SCRIPTPATH"/creds.txt
 
+if ping "wpa-sec.stanev.org" -c 1 -w 5 > /dev/null; then
+	:
+else
+	echo -e "\e[91mERROR\e[0m: wpa-sec.stanev.org couldn't be reached, check your internet connection"
+	exit
+fi
+
 while getopts "d:h?:*:" arg; do
 	case ${arg} in
 	d ) DIRECTORY="$OPTARG";;
