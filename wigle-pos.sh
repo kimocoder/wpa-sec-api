@@ -53,6 +53,8 @@ save_file ()
 		echo -e "\e[1A\e[KSaving networks to $FILENAME... ($CURRENT_LINE/$WC_LINES) - [$SSID]"
 		if ( echo "$APICONTENT" | grep 'too many queries today' ); then
 			echo -e "\e[91mERROR\e[0m: API query limit reached"
+			echo "Saving unlocated networks to $FILENAME.left"
+			tail -n +$CURRENT_LINE "$1" >> "$FILENAME".left
 			exit
 		fi
 		if ( echo "$APICONTENT" | grep '{"success":false,' > /dev/null ); then
