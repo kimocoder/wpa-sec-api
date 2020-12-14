@@ -1,7 +1,6 @@
 #!/bin/bash
 VERSION="v1.2"
-FILENAMES="*.pcapng*"
-SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$( cd "$(dirname "$0")" || exit >/dev/null 2>&1 ; pwd -P )"
 
 source "$SCRIPTPATH"/creds.txt
 
@@ -23,7 +22,7 @@ while getopts "d:h?:*:" arg; do
 		printf "Usage:\n\
 	%s <file.pcapng> or %s -d <direcory>
 Options:\n\
-	-d		direcory with captures (will upload all .pcapng files and move them to a subdirectory named uploaded)" "$0" "$0"
+	-d		direcory with captures (will upload all network capture files and move them to a subdirectory named uploaded)" "$0" "$0"
 		echo
 		exit
 	;;
@@ -53,11 +52,13 @@ if [[ $DIRECTORY == "" ]]; then
 		fi
 else
 	if test -d "$DIRECTORY"; then
-		echo "Uploading all .pcapng* files from $DIRECTORY"
-		FILES=$(find "$DIRECTORY/" -name "$FILENAMES")
+		mkdir -p "$DIRECTORY"/uploaded || { echo -e "\e[91mERROR\e[0m: Cannot create uploaded directory" ; exit 1; }
+		echo "Uploading all capture files from $DIRECTORY and moving to $DIRECTORY/uploaded"
+		FILES=$(find "$DIRECTORY"/ -print -exec file {} \; | grep "pcapng capture file" | awk '{print substr($1,1,length($1)-1)}')
 		for FILE in $FILES ; do
 			echo "Uploading $FILE..."
 			curl "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36'
+			mv "$FILE" "$DIRECTORY"/uploaded || { echo -e "\e[91mERROR\e[0m: Cannot move $FILE to uploaded" ; exit 1; }
 			echo
 		done
 	else
