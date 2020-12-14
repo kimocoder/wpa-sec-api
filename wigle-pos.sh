@@ -3,7 +3,7 @@
 # This script is used to process the newsites.txt or other potfiles outputted by sort-pot.sh
 
 VERSION="v1.2"
-SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit; } >/dev/null 2>&1 ; pwd -P )"
 
 source "$SCRIPTPATH"/creds.txt
 
