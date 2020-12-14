@@ -1,6 +1,6 @@
 #!/bin/bash
 VERSION="v1.2"
-SCRIPTPATH="$( cd "$(dirname "$0")" || exit >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit; } >/dev/null 2>&1 ; pwd -P )"
 
 source "$SCRIPTPATH"/creds.txt
 
