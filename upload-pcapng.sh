@@ -71,7 +71,7 @@ if [[ $DIRECTORY == "" ]]; then
 		if test -f "$FILE"; then
 			if [[ $GUI = true ]]; then
 				(curl "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE"\
-					-b "key="\
+					-b "key=$WPASECKEY"\
 					-A "$USER_AGENT" -# -o /tmp/curl-wpasec-output 2>&1 | while IFS= read -r -n1 char; do
 				    [[ $char =~ [0-9] ]] && keep=1 ;
 				    [[ $char == % ]] && echo "$progress" && progress="" && keep=0 ;
