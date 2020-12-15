@@ -34,9 +34,10 @@ while getopts "d:hg?:*:" arg; do
 		echo "https://github.com/Czechball/wpa-sec-api"
 		echo
 		printf "Usage:\n\
-	%s <file.pcapng> or %s -d <direcory>
+	%s <file.pcapng> or %s -d <direcory> or %s -g <other options>
 Options:\n\
-	-d		direcory with captures (will upload all network capture files and move them to a subdirectory named uploaded)" "$0" "$0"
+	-d		direcory with captures (will upload all network capture files and move them to a subdirectory named uploaded)\n\
+	-g		run in GUI using Zenity" "$0" "$0" "$0"
 		echo
 		exit
 	;;
