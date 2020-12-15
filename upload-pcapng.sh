@@ -12,19 +12,6 @@ show_usage ()
 	exit 1
 }
 
-zenity_error ()
-{
-	zenity --error --ellipsize --text="$1"
-	exit 1
-}
-
-if ping "wpa-sec.stanev.org" -c 1 -w 5 > /dev/null; then
-	:
-else
-	echo -e "\e[91mERROR\e[0m: wpa-sec.stanev.org couldn't be reached, check your internet connection"
-	exit
-fi
-
 while getopts "d:hg?:*:" arg; do
 	case ${arg} in
 	d ) DIRECTORY="$OPTARG";;
@@ -57,21 +44,34 @@ Options:\n\
 done
 shift $(( OPTIND-1 ))
 
+error ()
+{
+	if [[ "$2" == true ]]; then
+		zenity --error --ellipsize --text="$1"
+		exit 1
+	fi
+	echo -e "\e[91mERROR\e[0m: $1"
+}
+
+if ping "wpa-sec.stanev.org" -c 1 -w 5 > /dev/null; then
+	:
+else
+	error "wpa-sec.stanev.org couldn't be reached, check your internet connection" $GUI
+fi
+
 if [[ $WPASECKEY == "" ]]; then
-	echo -e "\e[91mERROR\e[0m: No wpa-sec key supplied. Enter your key into creds.txt"
-	exit
+	error "No wpa-sec key supplied. Enter your key into creds.txt" $GUI
 fi
 
 if [[ $DIRECTORY == "" ]]; then
 	FILE="$1"
 	if [[ $FILE == "" ]]; then
-		echo -e "\e[91mERROR\e[0m: No file specified. Use $0 -h for help"
-		exit
+		error "No file specified. Use $0 -h for help" $GUI
 	fi
 		if test -f "$FILE"; then
 			if [[ $GUI = true ]]; then
 				(curl "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE"\
-					-b "key=$WPASECKEY"\
+					-b "key="\
 					-A "$USER_AGENT" -# -o /tmp/curl-wpasec-output 2>&1 | while IFS= read -r -n1 char; do
 				    [[ $char =~ [0-9] ]] && keep=1 ;
 				    [[ $char == % ]] && echo "$progress" && progress="" && keep=0 ;
@@ -79,11 +79,11 @@ if [[ $DIRECTORY == "" ]]; then
 				done) | zenity --progress --title="Uploading..." --text="$FILE" --auto-kill --time-remaining --auto-close
 				RESULT=$(cat /tmp/curl-wpasec-output)
 				if echo "$RESULT" | grep "No valid handshakes" > /dev/null; then
-					zenity_error "No valid handshakes/PMKIDs found."
+					error "No valid handshakes/PMKIDs found." $GUI
 				elif echo "$RESULT" | grep "Not a valid capture file" > /dev/null; then
-					zenity_error "Not a valid capture file."
+					error "Not a valid capture file." $GUI
 				elif echo "$RESULT" | grep "was already submitted" > /dev/null; then
-					zenity_error "File was already uploaded before."
+					error "File was already uploaded before." $GUI
 				fi
 				HS_COUNT=$(echo "$RESULT" | grep "EAPOL pairs (best)" | sed 's/[^0-9]*//g')
 				PM_COUNT=$(echo "$RESULT" | grep "PMKID (best)" | sed 's/[^0-9]*//g')
@@ -105,16 +105,16 @@ if [[ $DIRECTORY == "" ]]; then
 				echo -e "\e[92m$TOTAL_COUNT handshakes\e[0m"
 			fi
 		else
-			echo "$FILE is not a valid file. Aborting"
+			error "$FILE is not a valid file. Aborting" $GUI
 		fi
 else
 	if test -d "$DIRECTORY"; then
 		mapfile -t FILES < <(find "$DIRECTORY"/ -maxdepth 1 -print -exec file {} \; | grep "pcapng capture file" | awk '{print substr($1,1,length($1)-1)}')
 		if [[ $FILES == "" ]]; then
-			echo -e "\e[91mERROR\e[0m: No valid capture files found in $DIRECTORY"
+			error "No valid capture files found in $DIRECTORY" $GUI
 			exit
 		fi
-		mkdir -p "$DIRECTORY"/uploaded || { echo -e "\e[91mERROR\e[0m: Cannot create uploaded directory" ; exit 1; }
+		mkdir -p "$DIRECTORY"/uploaded || { error "Cannot create uploaded directory" $GUI; }
 		echo "Uploading all capture files from $DIRECTORY and moving to $DIRECTORY/uploaded"
 		C=0
 		for FILE in "${FILES[@]}" ; do
@@ -138,6 +138,6 @@ else
 		done
 		echo -e "\e[92mUploaded $TOTAL_DIR_COUNT handshakes in total from $C files.\e[0m"
 	else
-		echo "$DIRECTORY is not a valid directory. Aborting"
+		error "$DIRECTORY is not a valid directory. Aborting" $GUI
 	fi
 fi
