@@ -25,7 +25,11 @@ for a single file, or
 ```sh
 ./upload-pcapng.sh -d <directory>
 ```
-for uploading all files matching `*.pcapng*` in the given directory.
+for uploading all files matching `*.pcapng*` in the given directory.  
+You can also invoke a Zenity "GUI" by using the -g parameter:
+```sh
+./upload-pcapng.sh -g ...
+```
 
 # wigle-pos.sh
 This script requires you to also fill out `NICK` and Wigle API credentials in `creds.txt`.  
