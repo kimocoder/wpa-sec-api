@@ -123,9 +123,9 @@ else
 					HS_COUNT=""
 					PM_COUNT=""
 					C=$(( C + 1 ))
+					RESULT=$(curl -s "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A "$USER_AGENT" 2>/dev/null)
 					echo "# File: $C/$FILE_COUNT	Handshakes: $TOTAL_DIR_COUNT"
 					printf %.3f\\n "$((1000 *   100*C/FILE_COUNT  ))e-3"
-					RESULT=$(curl -s "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A "$USER_AGENT" 2>/dev/null)
 					HS_COUNT=$(echo "$RESULT" | grep "EAPOL pairs (best)" | sed 's/[^0-9]*//g')
 					PM_COUNT=$(echo "$RESULT" | grep "PMKID (best)" | sed 's/[^0-9]*//g')
 					TOTAL_COUNT=$(( HS_COUNT + PM_COUNT ))
