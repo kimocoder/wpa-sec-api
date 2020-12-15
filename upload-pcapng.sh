@@ -76,7 +76,7 @@ if [[ $DIRECTORY == "" ]]; then
 				    [[ $char =~ [0-9] ]] && keep=1 ;
 				    [[ $char == % ]] && echo "$progress" && progress="" && keep=0 ;
 				    [[ $keep == 1 ]] && progress="$progress$char" ;
-				done) | zenity --progress --title="Uploading..." --text="$FILE" --auto-kill --time-remaining --auto-close
+				done) | zenity --progress --title="Uploading..." --text="$FILE" --auto-kill --auto-close
 				RESULT=$(cat /tmp/curl-wpasec-output)
 				if echo "$RESULT" | grep "No valid handshakes" > /dev/null; then
 					error "No valid handshakes/PMKIDs found." $GUI
@@ -117,26 +117,44 @@ else
 		mkdir -p "$DIRECTORY"/uploaded || { error "Cannot create uploaded directory" $GUI; }
 		echo "Uploading all capture files from $DIRECTORY and moving to $DIRECTORY/uploaded"
 		C=0
-		for FILE in "${FILES[@]}" ; do
-			HS_COUNT=""
-			PM_COUNT=""
-			C=$(( C + 1 ))
-			printf "Uploading %s... [%s/%s]: " "$FILE" "$C" "${#FILES[@]}"
-			RESULT=$(curl -s "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A "$USER_AGENT" 2>/dev/null)
-			if echo "$RESULT" | grep "No valid handshakes" > /dev/null; then
-				echo -e "\e[91mno valid handshakes/PMKIDs found.\e[0m"
-			elif echo "$RESULT" | grep "Not a valid capture file" > /dev/null; then
-				echo -e "\e[91mnot a valid capture file.\e[0m"
-			else
-			HS_COUNT=$(echo "$RESULT" | grep "EAPOL pairs (best)" | sed 's/[^0-9]*//g')
-			PM_COUNT=$(echo "$RESULT" | grep "PMKID (best)" | sed 's/[^0-9]*//g')
-			TOTAL_COUNT=$(( HS_COUNT + PM_COUNT ))
-			TOTAL_DIR_COUNT=$(( TOTAL_DIR_COUNT + TOTAL_COUNT ))
-			echo -e "\e[92m$TOTAL_COUNT handshakes\e[0m"
-			fi
-			mv "$FILE" "$DIRECTORY"/uploaded || { echo -e "\e[91mERROR\e[0m: Cannot move $FILE to uploaded" ; exit 1; }
-		done
-		echo -e "\e[92mUploaded $TOTAL_DIR_COUNT handshakes in total from $C files.\e[0m"
+		FILE_COUNT="${#FILES[@]}"
+		if [[ $GUI == true ]]; then
+				for FILE in "${FILES[@]}" ; do
+					HS_COUNT=""
+					PM_COUNT=""
+					C=$(( C + 1 ))
+					echo "# File: $C/$FILE_COUNT	Handshakes: $TOTAL_DIR_COUNT"
+					printf %.3f\\n "$((1000 *   100*C/FILE_COUNT  ))e-3"
+					RESULT=$(curl -s "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A "$USER_AGENT" 2>/dev/null)
+					HS_COUNT=$(echo "$RESULT" | grep "EAPOL pairs (best)" | sed 's/[^0-9]*//g')
+					PM_COUNT=$(echo "$RESULT" | grep "PMKID (best)" | sed 's/[^0-9]*//g')
+					TOTAL_COUNT=$(( HS_COUNT + PM_COUNT ))
+					TOTAL_DIR_COUNT=$(( TOTAL_DIR_COUNT + TOTAL_COUNT ))
+					mv "$FILE" "$DIRECTORY"/uploaded || { error "Cannot move $FILE to uploaded" $GUI; }
+				done > >(zenity --progress --width="500" --auto-close --auto-kill --time-remaining --title="Uploading $DIRECTORY")
+			zenity --info --ellipsize --title="Success" --text="Uploaded $FILE_COUNT files containing $TOTAL_DIR_COUNT handshakes"
+		else
+			for FILE in "${FILES[@]}" ; do
+				HS_COUNT=""
+				PM_COUNT=""
+				C=$(( C + 1 ))
+				printf "Uploading %s... [%s/%s]: " "$FILE" "$C" "${#FILES[@]}"
+				RESULT=$(curl -s "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A "$USER_AGENT" 2>/dev/null)
+				if echo "$RESULT" | grep "No valid handshakes" > /dev/null; then
+					echo -e "\e[91mno valid handshakes/PMKIDs found.\e[0m"
+				elif echo "$RESULT" | grep "Not a valid capture file" > /dev/null; then
+					echo -e "\e[91mnot a valid capture file.\e[0m"
+				else
+				HS_COUNT=$(echo "$RESULT" | grep "EAPOL pairs (best)" | sed 's/[^0-9]*//g')
+				PM_COUNT=$(echo "$RESULT" | grep "PMKID (best)" | sed 's/[^0-9]*//g')
+				TOTAL_COUNT=$(( HS_COUNT + PM_COUNT ))
+				TOTAL_DIR_COUNT=$(( TOTAL_DIR_COUNT + TOTAL_COUNT ))
+				echo -e "\e[92m$TOTAL_COUNT handshakes\e[0m"
+				fi
+				mv "$FILE" "$DIRECTORY"/uploaded || { error "Cannot move $FILE to uploaded" $GUI; }
+			done
+			echo -e "\e[92mUploaded $TOTAL_DIR_COUNT handshakes in total from $C files.\e[0m"
+		fi
 	else
 		error "$DIRECTORY is not a valid directory. Aborting" $GUI
 	fi
