@@ -80,8 +80,6 @@ fi
 
 if [[ $DIRECTORY == "" ]]; then
 	FILES=$*
-	for FILE in $FILES; do
-	done
 	if [[ $FILES == "" ]]; then
 		error "No file specified. Use $0 -h for help" $GUI
 	fi
