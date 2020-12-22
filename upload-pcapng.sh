@@ -79,14 +79,16 @@ if [[ $WPASECKEY == "" ]]; then
 fi
 
 if [[ $DIRECTORY == "" ]]; then
-	FILES=$*
+	FILES_R=$*
+	FILES_N=${FILES_R// /$'\n'}
+	mapfile -t FILES < <(echo $FILES_N)
 	if [[ $FILES == "" ]]; then
 		error "No file specified. Use $0 -h for help" $GUI
 	fi
 	FILE_COUNT="${#FILES[@]}"
 	C=0
 	TOTAL_DIR_COUNT=0
-			if test -f "$FILE"; then
+			if test -f $FILE; then
 				if [[ $GUI = true ]]; then
 					for FILE in $FILES; do
 						HS_COUNT=""
