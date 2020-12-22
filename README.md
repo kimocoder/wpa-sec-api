@@ -19,9 +19,9 @@ This script uses get-pot.sh to download your potfile, removes STA mac addresses,
 This script is used to upload capture files to wpa-sec.  
 Usage:
 ```sh
-./upload-pcapng.sh <filename>
+./upload-pcapng.sh <filename(s)>
 ```
-for a single file, or
+for a single file or multiple files (it's also possible to use wildcards, like 2020-12-\*), or
 ```sh
 ./upload-pcapng.sh -d <directory>
 ```
