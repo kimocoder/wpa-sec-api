@@ -4,23 +4,31 @@
 
 VERSION="v1.2"
 SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit 1; } >/dev/null 2>&1 ; pwd -P )"
+CONFIGFILE="$SCRIPTPATH"/config.txt
 
-source "$SCRIPTPATH"/creds.txt  || { echo -e "\e[91mERROR\e[0m: creds.txt doesn't exist in scritp path" ; exit 1; }
+if test -f "$CONFIGFILE"; then
+	:
+else
+	echo "$CONFIGFILE doesn't exist, creating a new one using setup.sh"
+	"$SCRIPTPATH"/setup.sh
+fi
+
+source "$CONFIGFILE"  || { echo -e "\e[91mERROR\e[0m: $CONFIGFILE doesn't exist in script path" ; exit 1; }
 
 echo "wpa-sec-api $VERSION by Czechball"
 if [[ $WIGLEAPINAME == "" ]]; then
 	echo -e "\e[91mERROR\e[0m: Wigle API Name is missing. You can get it from https://wigle.net/account"
-	echo "Enter your credentials into creds.txt"
+	echo "Enter your credentials into $CONFIGFILE"
 	exit 1
 	if [[ $WIGLEAPIKEY == "" ]]; then
 		echo -e "\e[91mERROR\e[0m: Wigle API Key is missing. You can get it from https://wigle.net/account"
-		echo "Enter your credentials into creds.txt"
+		echo "Enter your credentials into $CONFIGFILE"
 		exit 1
 	fi
 fi
 
 if [[ $NICK == "" ]]; then
-	echo -e "\e[91mERROR\e[0m: No user nickname defined. Put your username into creds.txt"
+	echo -e "\e[91mERROR\e[0m: No user nickname defined. Put your username into $CONFIGFILE"
 	exit 1
 fi
 
