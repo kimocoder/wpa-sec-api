@@ -1,21 +1,29 @@
 #!/bin/bash
 VERSION="v1.2"
 SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit 1; } >/dev/null 2>&1 ; pwd -P )"
+CONFIGFILE="$SCRIPTPATH"/config.txt
 
-source "$SCRIPTPATH"/creds.txt || { echo -e "\e[91mERROR\e[0m: creds.txt doesn't exist in scritp path" ; exit 1; }
+if test -f "$CONFIGFILE"; then
+	:
+else
+	echo "$CONFIGFILE doesn't exist, creating a new one using setup.sh"
+	"$SCRIPTPATH"/setup.sh
+fi
+
+source "$CONFIGFILE" || { echo -e "\e[91mERROR\e[0m: $CONFIGFILE doesn't exist in script path" ; exit 1; }
 
 echo "wpa-sec-api $VERSION by Czechball"
 
-if ping "wpa-sec.stanev.org" -c 1 -w 5 > /dev/null; then
+if curl --head -s "$DWPAURL" >/dev/null; then
 	:
 else
-	echo -e "\e[91mERROR\e[0m: wpa-sec.stanev.org couldn't be reached, check your internet connection"
+	echo -e "\e[91mERROR\e[0m: $DWPAURL couldn't be reached, check your internet connection"
 	exit 1
 fi
 
 if [[ $1 == "" ]]; then
-	if [[ $WPASECKEY == "" ]]; then
-		echo -e "\e[91mERROR\e[0m: No wpa-sec key supplied. Enter your key into creds.txt"
+	if [[ $DWPAKEY == "" ]]; then
+		echo -e "\e[91mERROR\e[0m: No wpa-sec key supplied. Enter your key into $CONFIGFILE"
 		exit 1
 	else
 		if test -f "current.potfile"; then
@@ -39,7 +47,7 @@ if [[ $1 == "" ]]; then
 			echo -e "\e[92m$WC_LINES new sites cracked.\e[0m"
 		else
 			echo -e "\e[33mNo previous potfiles detected, downloading remote potfile...\e[0m"
-			./get-pot.sh "$KEY" | sort | uniq -w 12 | cut -d ":" -f 1,3,4 > current.potfile
+			"$SCRIPTPATH"/get-pot.sh "$KEY" | sort | uniq -w 12 | cut -d ":" -f 1,3,4 > current.potfile
 		fi
 	fi
 else
