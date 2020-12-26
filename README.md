@@ -10,7 +10,7 @@ There are only two dependencies:
 
 # get-pot.sh
 This script simply downloads your wpa-sec potfile. Nothing special.  
-To use this and other wpa-sec related scripts, you need to enter your wpa-sec key in the `creds.txt` file.
+To use this and other wpa-sec related scripts, you need to run the `setup.sh` script, which will create a `config.txt` file. Alternatively you can copy the example config file and fill in the variables.
 
 # sort-pot.sh
 This script uses get-pot.sh to download your potfile, removes STA mac addresses, sorts all records by AP mac address and removes duplicates. On the first run, this script will simply generate a file named `current.potfile`. When you run it again, it will compare the currently downloaded potfile with the old `current.potfile` file. It will generate a file named `newsites.txt`, which will contain new cracked sites. It will also rename the old `current.potfile` to `old.potfile` and move the previous `old.potfile` to a folder named `archive`.
@@ -32,7 +32,7 @@ You can also invoke a Zenity "GUI" by using the -g parameter:
 ```
 
 # wigle-pos.sh
-This script requires you to also fill out `NICK` and Wigle API credentials in `creds.txt`.  
+This script requires you to also fill out `NICK` and Wigle API credentials in `config.txt` (using the `setup.sh` script).  
 wigle-pos.sh is used to geolocate cracked networks using Wigle.net. It will output a file formatted as following:  
 ```
 lat;long;bssid;essid;psk
@@ -42,5 +42,5 @@ Usage:
 ```sh
 ./wigle-pos.sh newsites.txt
 ```
-this will output a file named current-date_nickname-in-credstxt.txt  
+this will output a file named current-date_nickname-in-configtxt.txt  
 As input, this script can only process potfiles outputted by `sort-pot.sh` (such as *current.potfile*, *old.potfile* and *newsites.txt*), **not** unformatted potfiles straight from wpa-sec.
