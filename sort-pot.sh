@@ -1,8 +1,8 @@
 #!/bin/bash
 VERSION="v1.2"
-SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit; } >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit 1; } >/dev/null 2>&1 ; pwd -P )"
 
-source "$SCRIPTPATH"/creds.txt || { echo -e "\e[91mERROR\e[0m: creds.txt doesn't exist in scritp path" ; exit; }
+source "$SCRIPTPATH"/creds.txt || { echo -e "\e[91mERROR\e[0m: creds.txt doesn't exist in scritp path" ; exit 1; }
 
 echo "wpa-sec-api $VERSION by Czechball"
 
@@ -10,13 +10,13 @@ if ping "wpa-sec.stanev.org" -c 1 -w 5 > /dev/null; then
 	:
 else
 	echo -e "\e[91mERROR\e[0m: wpa-sec.stanev.org couldn't be reached, check your internet connection"
-	exit
+	exit 1
 fi
 
 if [[ $1 == "" ]]; then
 	if [[ $WPASECKEY == "" ]]; then
 		echo -e "\e[91mERROR\e[0m: No wpa-sec key supplied. Enter your key into creds.txt"
-		exit
+		exit 1
 	else
 		if test -f "current.potfile"; then
 			echo -e "\e[1mcurrent.pot\e[0m exists, downloading remote potfile..."
@@ -48,6 +48,6 @@ else
 		sort "$1" | uniq -w 12 | cut -d ":" -f 1,3,4 > "parsed-$1"
 	else
 		echo  "$1 is not a valid file"
-		exit
+		exit 1
 	fi
 fi

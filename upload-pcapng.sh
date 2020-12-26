@@ -1,10 +1,10 @@
 #!/bin/bash
 VERSION="v1.2"
-SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit; } >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit 1; } >/dev/null 2>&1 ; pwd -P )"
 GUI=false
 USER_AGENT="upload-pcapng $VERSION, part of wpa-sec-api by Czechball (https://github.com/Czechball/wpa-sec-api)"
 
-source "$SCRIPTPATH"/creds.txt || { echo -e "\e[91mERROR\e[0m: creds.txt doesn't exist in scritp path" ; exit; }
+source "$SCRIPTPATH"/creds.txt || { echo -e "\e[91mERROR\e[0m: creds.txt doesn't exist in scritp path" ; exit 1; }
 
 echo "wpa-sec-api $VERSION by Czechball"
 
