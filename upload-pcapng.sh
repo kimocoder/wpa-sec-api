@@ -3,8 +3,16 @@ VERSION="v1.2"
 SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit 1; } >/dev/null 2>&1 ; pwd -P )"
 GUI=false
 USER_AGENT="upload-pcapng $VERSION, part of wpa-sec-api by Czechball (https://github.com/Czechball/wpa-sec-api)"
+CONFIGFILE="$SCRIPTPATH"/config.txt
 
-source "$SCRIPTPATH"/creds.txt || { echo -e "\e[91mERROR\e[0m: creds.txt doesn't exist in scritp path" ; exit 1; }
+if test -f "$CONFIGFILE"; then
+	:
+else
+	echo "$CONFIGFILE doesn't exist, creating a new one using setup.sh"
+	"$SCRIPTPATH"/setup.sh
+fi
+
+source "$CONFIGFILE" || { echo -e "\e[91mERROR\e[0m: $CONFIGFILE doesn't exist in script path" ; exit 1; }
 
 echo "wpa-sec-api $VERSION by Czechball"
 
@@ -70,14 +78,14 @@ info ()
 	fi
 }
 
-if ping "wpa-sec.stanev.org" -c 1 -w 5 > /dev/null; then
+if curl --head -s "$DWPAURL" >/dev/null; then
 	:
 else
-	error "wpa-sec.stanev.org couldn't be reached, check your internet connection" $GUI
+	error "$DWPAURL couldn't be reached, check your internet connection" $GUI
 fi
 
-if [[ $WPASECKEY == "" ]]; then
-	error "No wpa-sec key supplied. Enter your key into creds.txt" $GUI
+if [[ $DWPAKEY == "" ]]; then
+	error "No wpa-sec key supplied. Enter your key into $CONFIGFILE" $GUI
 fi
 
 if [[ $DIRECTORY == "" ]]; then
@@ -96,7 +104,7 @@ if [[ $DIRECTORY == "" ]]; then
 						HS_COUNT=""
 						PM_COUNT=""
 						C=$(( C + 1 ))
-						RESULT=$(curl -s "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A "$USER_AGENT" 2>/dev/null)
+						RESULT=$(curl -s "$DWPAURL/?submit" -X POST -F "file=@$FILE" -b "key=$DWPAKEY" -A "$USER_AGENT" 2>/dev/null)
 						HS_COUNT=$(echo "$RESULT" | grep "EAPOL pairs (best)" | sed 's/[^0-9]*//g')
 						PM_COUNT=$(echo "$RESULT" | grep "PMKID (best)" | sed 's/[^0-9]*//g')
 						TOTAL_COUNT=$(( HS_COUNT + PM_COUNT ))
@@ -116,7 +124,7 @@ if [[ $DIRECTORY == "" ]]; then
 				else
 					for FILE in $FILES; do
 						printf "Uploading %s... " "$FILE"
-						RESULT=$(curl -s "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A "$USER_AGENT" 2>/dev/null)
+						RESULT=$(curl -s "$DWPAURL/?submit" -X POST -F "file=@$FILE" -b "key=$DWPAKEY" -A "$USER_AGENT" 2>/dev/null)
 						if echo "$RESULT" | grep "No valid handshakes" > /dev/null; then
 							echo -e "\e[91mno valid handshakes/PMKIDs found.\e[0m"
 						elif echo "$RESULT" | grep "Not a valid capture file" > /dev/null; then
@@ -154,7 +162,7 @@ else
 					HS_COUNT=""
 					PM_COUNT=""
 					C=$(( C + 1 ))
-					RESULT=$(curl -s "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A "$USER_AGENT" 2>/dev/null)
+					RESULT=$(curl -s "$DWPAURL/?submit" -X POST -F "file=@$FILE" -b "key=$DWPAKEY" -A "$USER_AGENT" 2>/dev/null)
 					HS_COUNT=$(echo "$RESULT" | grep "EAPOL pairs (best)" | sed 's/[^0-9]*//g')
 					PM_COUNT=$(echo "$RESULT" | grep "PMKID (best)" | sed 's/[^0-9]*//g')
 					TOTAL_COUNT=$(( HS_COUNT + PM_COUNT ))
@@ -170,7 +178,7 @@ else
 				PM_COUNT=""
 				C=$(( C + 1 ))
 				printf "Uploading %s... [%s/%s]: " "$FILE" "$C" "${#FILES[@]}"
-				RESULT=$(curl -s "https://wpa-sec.stanev.org/?submit" -X POST -F "file=@$FILE" -b "key=$WPASECKEY" -A "$USER_AGENT" 2>/dev/null)
+				RESULT=$(curl -s "$DWPAURL/?submit" -X POST -F "file=@$FILE" -b "key=$DWPAKEY" -A "$USER_AGENT" 2>/dev/null)
 				if echo "$RESULT" | grep "No valid handshakes" > /dev/null; then
 					echo -e "\e[91mno valid handshakes/PMKIDs found.\e[0m"
 				elif echo "$RESULT" | grep "Not a valid capture file" > /dev/null; then
