@@ -23,6 +23,7 @@ if [[ $1 == "" ]]; then
 			./get-pot.sh "$KEY" | sort | uniq -w 12 | cut -d ":" -f 1,3,4 > temp-pot.txt
 			if cmp -s temp-pot.txt current.potfile; then
 				echo "No new sites cracked."
+				rm temp-pot.txt
 				exit
 			fi
 			if test -f "old.potfile"; then
