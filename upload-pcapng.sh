@@ -4,7 +4,9 @@ SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path 
 GUI=false
 USER_AGENT="upload-pcapng $VERSION, part of wpa-sec-api by Czechball (https://github.com/Czechball/wpa-sec-api)"
 
-source "$SCRIPTPATH"/creds.txt
+source "$SCRIPTPATH"/creds.txt || { echo -e "\e[91mERROR\e[0m: creds.txt doesn't exist in scritp path" ; exit; }
+
+echo "wpa-sec-api $VERSION by Czechball"
 
 show_usage ()
 {

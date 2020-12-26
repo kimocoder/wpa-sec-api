@@ -3,7 +3,7 @@ VERSION="v1.2"
 SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit; } >/dev/null 2>&1 ; pwd -P )"
 USER_AGENT="get-pot $VERSION, part of wpa-sec-api by Czechball (https://github.com/Czechball/wpa-sec-api)"
 
-source "$SCRIPTPATH"/creds.txt
+source "$SCRIPTPATH"/creds.txt || { echo -e "\e[91mERROR\e[0m: creds.txt doesn't exist in scritp path" ; exit; }
 
 if ping "wpa-sec.stanev.org" -c 1 -w 5 > /dev/null; then
 	:
