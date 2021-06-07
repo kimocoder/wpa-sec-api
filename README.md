@@ -2,7 +2,7 @@
 
 Collection of bash scripts that work with [dwpa](https://github.com/RealEnder/dwpa) and [Wigle.net](https://wigle.net/)
 
-# Dependepcies
+# Dependencies
 There are only two dependencies:
 
 * jq
