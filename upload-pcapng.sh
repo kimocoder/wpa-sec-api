@@ -115,7 +115,7 @@ hcx_to_wigle ()
 
 wigle_upload ()
 {
-	local TMPFILE=$(mktemp -u)
+	local TMPFILE=$(mktemp -u --suffix .zip)
 	if [[ $1 == "dir" ]]; then
 		info "Uploading to Wigle from a directory is not implemented yet" $GUI
 	elif [[ $1 == "file" ]]; then
