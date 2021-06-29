@@ -14,6 +14,11 @@ fi
 
 source "$CONFIGFILE" || { echo -e "\e[91mERROR\e[0m: $CONFIGFILE doesn't exist in script path" ; exit 1; }
 
+which hcxpcapngtool > /dev/null || { echo Error: hcxpcapngtool is not installed, you can get it from "https://github.com/ZerBea/hcxtools"; exit 1; }
+which zip > /dev/null || { echo Error: zip is not installed; exit 1; }
+which jq > /dev/null || { echo Error: jq is not installed; exit 1; }
+
+
 echo "wpa-sec-api $VERSION by Czechball"
 
 show_usage ()
