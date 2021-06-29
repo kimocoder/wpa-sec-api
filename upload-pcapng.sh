@@ -141,8 +141,8 @@ wigle_upload ()
 					exit
 				fi
 		fi
-		RESULT=$(curl -X POST "https://api.wigle.net/api/v2/file/upload" -H "accept: application/json" -u "$WIGLEAPINAME":"$WIGLEAPIKEY" --basic -H "Content-Type: multipart/form-data" -F "file=@$TMPFILE;type=application/zip" -F "donate=on" -A "$USER_AGENT")
-		if (echo $RESULT | grep '"success":true'); then
+		RESULT=$(curl -s -X POST "https://api.wigle.net/api/v2/file/upload" -H "accept: application/json" -u "$WIGLEAPINAME":"$WIGLEAPIKEY" --basic -H "Content-Type: multipart/form-data" -F "file=@$TMPFILE;type=application/zip" -F "donate=on" -A "$USER_AGENT" 2>/dev/null)
+		if (echo $RESULT | grep '"success":true' > /dev/null); then
 			info "Upload succesful" $GUI
 		else
 			error "Upload failed" $GUI
