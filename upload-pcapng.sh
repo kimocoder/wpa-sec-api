@@ -78,6 +78,63 @@ info ()
 	fi
 }
 
+hcx_to_wigle ()
+{
+	info "Creating Wigle CSV from $1..."
+	local FILENAME=$(mktemp)
+	local TMPFILE=$(mktemp)
+	APPLICATION=$(hcxpcapngtool "$1" | grep application | awk 'BEGIN { FS = " " } ; { print $2 }')
+	VERSION=$(hcxpcapngtool "$1" | grep application | awk 'BEGIN { FS = " " } ; { print $3 }')
+	VENDOR=$(hcxpcapngtool "$1" | grep "interface vendor" | awk 'BEGIN { FS = " " } ; {print $3 }')
+
+	# Create .csv from hcxpcapngtool
+
+	hcxpcapngtool "$1" --csv "$TMPFILE" > /dev/null
+
+	# Insert pre-header
+
+	echo "WigleWifi-1.4,appRelease=$APPLICATION $VERSION,model=$APPLICATION,release=$VERSION,device=$APPLICATION,display=$APPLICATION,board=$APPLICATION,brand=$VENDOR" > "$FILENAME"
+
+	# Insert header
+
+	echo "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type" >> "$FILENAME"
+
+	# Insert values from actual csv
+
+	awk 'BEGIN { FS = "\t" } ; { print $3","$4","$5$6","$1" "$2","$9","$10","$15","$16","$20",0,WIFI" }' "$TMPFILE" >> "$FILENAME"
+
+	HCX_OUTPUT="$FILENAME"
+
+	rm "$TMPFILE"
+}
+
+wigle_upload ()
+{
+	local TMPFILE=$(mktemp -u)
+	if [[ $1 == "dir" ]]; then
+		info "Uploading to Wigle from a directory is not implemented yet" $GUI
+	elif [[ $1 == "file" ]]; then
+		for FILE in $FILES; do
+			printf "Checking GPS data in $FILE... "
+			if (hcxpcapngtool "$FILE" | grep "NMEA" > /dev/null); then
+			 	echo "found"
+			 	hcx_to_wigle "$FILE"
+			 	zip -rvq "$TMPFILE" "$HCX_OUTPUT"
+			 	rm "$HCX_OUTPUT"
+			 else
+			 	echo "not found"
+			fi
+		done
+		info "Uploading files to Wigle.net..." $GUI
+		RESULT=$(curl -X POST "https://api.wigle.net/api/v2/file/upload" -H "accept: application/json" -u "$WIGLEAPINAME":"$WIGLEAPIKEY" --basic -H "Content-Type: multipart/form-data" -F "file=@$TMPFILE;type=application/zip" -F "donate=on" -A "$USER_AGENT")
+		if (echo $RESULT | grep '"success":true'); then
+			info "Upload succesful" $GUI
+		else
+			error "Upload failed" $GUI
+		fi
+	fi
+}
+
 if curl --head -s "$DWPAURL" >/dev/null; then
 	:
 else
@@ -120,7 +177,7 @@ if [[ $DIRECTORY == "" ]]; then
 					# 	error "File was already uploaded before." $GUI
 					# fi
 					zenity --info --title="Success" --text="$TOTAL_COUNT handshakes uploaded from $FILE_COUNT file(s)" --ellipsize
-					exit
+					wigle_upload file "$FILES"
 				else
 					for FILE in $FILES; do
 						printf "Uploading %s... " "$FILE"
@@ -141,7 +198,7 @@ if [[ $DIRECTORY == "" ]]; then
 						fi
 					done
 					info "Total handshakes: $TOTAL_DIR_COUNT"
-					exit
+					wigle_upload file "$FILES"
 				fi
 			else
 				warning "$FILES is not a valid file."
@@ -169,6 +226,7 @@ else
 					TOTAL_DIR_COUNT=$(( TOTAL_DIR_COUNT + TOTAL_COUNT ))
 					echo "# File: $C/$FILE_COUNT	Handshakes: $TOTAL_DIR_COUNT"
 					printf %.3f\\n "$((1000 *   100*C/FILE_COUNT  ))e-3"
+					wigle_upload dir
 					mv "$FILE" "$DIRECTORY"/uploaded || { error "Cannot move $FILE to uploaded" $GUI; }
 				done > >(zenity --progress --width="500" --auto-close --auto-kill --time-remaining --title="Uploading $DIRECTORY")
 			zenity --info --ellipsize --title="Success" --text="Uploaded $FILE_COUNT files containing $TOTAL_DIR_COUNT handshakes"
@@ -190,6 +248,7 @@ else
 				TOTAL_DIR_COUNT=$(( TOTAL_DIR_COUNT + TOTAL_COUNT ))
 				echo -e "\e[92m$TOTAL_COUNT handshakes\e[0m"
 				fi
+				wigle_upload dir
 				mv "$FILE" "$DIRECTORY"/uploaded || { error "Cannot move $FILE to uploaded" $GUI; }
 			done
 			echo -e "\e[92mUploaded $TOTAL_DIR_COUNT handshakes in total from $C files.\e[0m"
