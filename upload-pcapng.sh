@@ -131,6 +131,16 @@ wigle_upload ()
 			fi
 		done
 		info "Uploading files to Wigle.net..." $GUI
+		if [[ $WIGLEAPINAME == "" ]]; then
+			read -p "Warning, no Wigle API credentials specified in config.txt - upload anonymously? (Y/n) " -n 1 -r
+			echo
+				if [[ $REPLY =~ ^[Yy]$ ]]
+				then
+					:
+				else
+					exit
+				fi
+		fi
 		RESULT=$(curl -X POST "https://api.wigle.net/api/v2/file/upload" -H "accept: application/json" -u "$WIGLEAPINAME":"$WIGLEAPIKEY" --basic -H "Content-Type: multipart/form-data" -F "file=@$TMPFILE;type=application/zip" -F "donate=on" -A "$USER_AGENT")
 		if (echo $RESULT | grep '"success":true'); then
 			info "Upload succesful" $GUI
