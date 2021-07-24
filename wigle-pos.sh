@@ -27,13 +27,8 @@ if [[ $WIGLEAPINAME == "" ]]; then
 	fi
 fi
 
-if [[ $NICK == "" ]]; then
-	echo -e "\e[91mERROR\e[0m: No user nickname defined. Put your username into $CONFIGFILE"
-	exit 1
-fi
-
 DATE=$(date --iso-8601)
-FILENAME="${DATE}_$NICK.txt"
+FILENAME="${DATE}.txt"
 
 if [[ $1 == "" ]]; then
 	echo "Usage: $0 newsites.txt"

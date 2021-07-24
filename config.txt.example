@@ -3,6 +3,5 @@ CONF_VERSION="v1.3"
 
 DWPAURL="https://wpa-sec.stanev.org/"
 DWPAKEY=""
-NICK=""
 WIGLEAPINAME=""
 WIGLEAPIKEY=""
