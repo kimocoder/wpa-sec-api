@@ -25,6 +25,7 @@ wigle_question()
 read -r -p "Enable Wigle.net uploads? (true/false) [default: true] " ENABLE_WIGLE_UPLOAD
 }
 wigle_question
+ENABLE_WIGLE_UPLOAD=${ENABLE_WIGLE_UPLOAD:-true}
 if [[ "$ENABLE_WIGLE_UPLOAD" != "true" && "$ENABLE_WIGLE_UPLOAD" != "false" ]]; then
 	echo "Please enter a correct value (true/false)"
 	wigle_question
