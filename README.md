@@ -3,10 +3,11 @@
 Collection of bash scripts that work with [dwpa](https://github.com/RealEnder/dwpa) and [Wigle.net](https://wigle.net/)
 
 # Dependencies
-There are only two dependencies:
+There are three dependencies:
 
 * jq
 * curl
+* hcxpcapngtool (from [hcxtools](https://github.com/ZerBea/hcxtools))
 
 # get-pot.sh
 This script simply downloads your wpa-sec potfile. Nothing special.  
