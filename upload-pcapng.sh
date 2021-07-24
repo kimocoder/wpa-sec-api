@@ -115,6 +115,10 @@ hcx_to_wigle ()
 
 wigle_upload ()
 {
+	if [[ $ENABLE_WIGLE_UPLOAD != "true" ]]; then
+		echo "Wigle upload was skipped because it was disabled in config."
+		return 0
+	fi
 	local TMPFILE=$(mktemp -u --suffix .zip)
 	if [[ $1 == "dir" ]]; then
 

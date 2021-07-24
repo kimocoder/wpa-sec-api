@@ -31,6 +31,7 @@ You can also invoke a Zenity "GUI" by using the -g parameter:
 ```sh
 ./upload-pcapng.sh -g ...
 ```
+It will also check if GPS data are present in .pcapng files that are being uploaded to wpa-sec, converts the GPS data to a [Wigle.net compatible CSV format](https://api.wigle.net/csvFormat.html) and uploads them to Wigle.net using the provided credentials. This is enabled by default and can be disabled in config.txt
 
 # wigle-pos.sh
 This script requires you to also fill out Wigle API credentials in `config.txt` (using the `setup.sh` script).  
