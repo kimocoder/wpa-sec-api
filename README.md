@@ -33,7 +33,7 @@ You can also invoke a Zenity "GUI" by using the -g parameter:
 ```
 
 # wigle-pos.sh
-This script requires you to also fill out `NICK` and Wigle API credentials in `config.txt` (using the `setup.sh` script).  
+This script requires you to also fill out Wigle API credentials in `config.txt` (using the `setup.sh` script).  
 wigle-pos.sh is used to geolocate cracked networks using Wigle.net. It will output a file formatted as following:  
 ```
 lat;long;bssid;essid;psk
@@ -43,5 +43,5 @@ Usage:
 ```sh
 ./wigle-pos.sh newsites.txt
 ```
-this will output a file named current-date_nickname-in-configtxt.txt  
+this will output a file named current-date.txt  
 As input, this script can only process potfiles outputted by `sort-pot.sh` (such as *current.potfile*, *old.potfile* and *newsites.txt*), **not** unformatted potfiles straight from wpa-sec.
