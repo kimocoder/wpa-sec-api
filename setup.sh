@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION="v1.3"
+VERSION="v1.3.1"
 SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit 1; } >/dev/null 2>&1 ; pwd -P )"
 
 if test -f "$SCRIPTPATH"/config.txt; then

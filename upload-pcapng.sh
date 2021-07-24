@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION="v1.3"
+VERSION="v1.3.1"
 SCRIPTPATH="$( cd "$(dirname "$0")" || { echo -e "\e[91mERROR\e[0m: Script path cannot be found" ; exit 1; } >/dev/null 2>&1 ; pwd -P )"
 GUI=false
 USER_AGENT="upload-pcapng $VERSION, part of wpa-sec-api by Czechball (https://github.com/Czechball/wpa-sec-api)"
@@ -137,6 +137,7 @@ wigle_upload ()
 		done
 		info "Uploading files to Wigle.net..." $GUI
 		if [[ $WIGLEAPINAME == "" ]]; then
+			# Anonymous uploading is broken for some reason, will be fixed in the next version (1.4)
 			read -p "Warning, no Wigle API credentials specified in config.txt - upload anonymously? (Y/n) " -n 1 -r
 			echo
 				if [[ $REPLY =~ ^[Yy]$ ]]
