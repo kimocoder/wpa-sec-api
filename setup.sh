@@ -21,7 +21,7 @@ read -r -p "Enter your dwpa (wpa-sec) key: " DWPAKEY
 read -r -p "Enter your Wigle API name (from https://wigle.net/account): " WIGLEAPINAME
 read -r -p "Enter your Wigle API key: " WIGLEAPIKEY
 
-echo git@github.com:Czechball/wpa-sec-api.git"#!/bin/bash" > "$SCRIPTPATH"/config.txt || { echo -e "\e[91mERROR\e[0m: Can't write to $SCRIPTPATH/config.txt" ; exit 1; }
+echo "#!/bin/bash" > "$SCRIPTPATH"/config.txt || { echo -e "\e[91mERROR\e[0m: Can't write to $SCRIPTPATH/config.txt" ; exit 1; }
 echo "CONF_VERSION=\"$VERSION\"" >> "$SCRIPTPATH"/config.txt
 echo >> "$SCRIPTPATH"/config.txt
 echo "DWPAURL=\"$DWPAURL\"" >> "$SCRIPTPATH"/config.txt
