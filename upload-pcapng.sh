@@ -117,6 +117,7 @@ wigle_upload ()
 {
 	local TMPFILE=$(mktemp -u --suffix .zip)
 	if [[ $1 == "dir" ]]; then
+
 		info "Uploading to Wigle from a directory is not implemented yet" $GUI
 	elif [[ $1 == "file" ]]; then
 		for FILE in $FILES; do
@@ -184,13 +185,6 @@ if [[ $DIRECTORY == "" ]]; then
 						printf %.3f\\n "$((1000 *   100*C/FILE_COUNT  ))e-3"
 						echo "# File: $C/$FILE_COUNT	Handshakes: $TOTAL_DIR_COUNT"
 					done > >(zenity --progress --width="500" --auto-close --auto-kill --time-remaining --title="Uploading $FILE_COUNT files")
-					# if echo "$RESULT" | grep "No valid handshakes" > /dev/null; then
-					# 	error "No valid handshakes/PMKIDs found." $GUI
-					# elif echo "$RESULT" | grep "Not a valid capture file" > /dev/null; then
-					# 	error "Not a valid capture file." $GUI
-					# elif echo "$RESULT" | grep "was already submitted" > /dev/null; then
-					# 	error "File was already uploaded before." $GUI
-					# fi
 					zenity --info --title="Success" --text="$TOTAL_COUNT handshakes uploaded from $FILE_COUNT file(s)" --ellipsize
 					wigle_upload file "$FILES"
 				else
@@ -245,6 +239,7 @@ else
 					mv "$FILE" "$DIRECTORY"/uploaded || { error "Cannot move $FILE to uploaded" $GUI; }
 				done > >(zenity --progress --width="500" --auto-close --auto-kill --time-remaining --title="Uploading $DIRECTORY")
 			zenity --info --ellipsize --title="Success" --text="Uploaded $FILE_COUNT files containing $TOTAL_DIR_COUNT handshakes"
+			wigle_upload file $FILES
 		else
 			for FILE in "${FILES[@]}" ; do
 				HS_COUNT=""
@@ -267,6 +262,7 @@ else
 				mv "$FILE" "$DIRECTORY"/uploaded || { error "Cannot move $FILE to uploaded" $GUI; }
 			done
 			echo -e "\e[92mUploaded $TOTAL_DIR_COUNT handshakes in total from $C files.\e[0m"
+			wigle_upload file $FILES
 		fi
 	else
 		error "$DIRECTORY is not a valid directory. Aborting" $GUI
