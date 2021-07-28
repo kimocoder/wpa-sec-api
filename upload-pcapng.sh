@@ -119,17 +119,17 @@ wigle_upload ()
 		echo "Wigle upload was skipped because it was disabled in config."
 		return 0
 	fi
-	if [[ $WIGLEAPINAME == "" ]]; then
+	#if [[ $WIGLEAPINAME == "" ]]; then
 		# Anonymous uploading is broken for some reason, will be fixed in the next version (1.4)
-		read -p "Warning, no Wigle API credentials specified in config.txt - upload anonymously? (Y/n) " -n 1 -r
-		echo
-			if [[ $REPLY =~ ^[Yy]$ ]]
-			then
-				:
-			else
-				return 0
-			fi
-	fi
+	#	read -p "Warning, no Wigle API credentials specified in config.txt - upload anonymously? (Y/n) " -n 1 -r
+	#	echo
+	#		if [[ $REPLY =~ ^[Yy]$ ]]
+	#		then
+	#			:
+	#		else
+	#			return 0
+	#		fi
+	#fi
 	local TMPFILE=$(mktemp -u --suffix .zip)
 	if [[ $1 == "dir" ]]; then
 
