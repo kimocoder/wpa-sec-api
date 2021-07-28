@@ -127,7 +127,7 @@ wigle_upload ()
 			then
 				:
 			else
-				exit
+				return 0
 			fi
 	fi
 	local TMPFILE=$(mktemp -u --suffix .zip)
