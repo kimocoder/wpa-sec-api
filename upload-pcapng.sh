@@ -119,6 +119,17 @@ wigle_upload ()
 		echo "Wigle upload was skipped because it was disabled in config."
 		return 0
 	fi
+	if [[ $WIGLEAPINAME == "" ]]; then
+		# Anonymous uploading is broken for some reason, will be fixed in the next version (1.4)
+		read -p "Warning, no Wigle API credentials specified in config.txt - upload anonymously? (Y/n) " -n 1 -r
+		echo
+			if [[ $REPLY =~ ^[Yy]$ ]]
+			then
+				:
+			else
+				exit
+			fi
+	fi
 	local TMPFILE=$(mktemp -u --suffix .zip)
 	if [[ $1 == "dir" ]]; then
 
@@ -136,17 +147,6 @@ wigle_upload ()
 			fi
 		done
 		info "Uploading files to Wigle.net..." $GUI
-		if [[ $WIGLEAPINAME == "" ]]; then
-			# Anonymous uploading is broken for some reason, will be fixed in the next version (1.4)
-			read -p "Warning, no Wigle API credentials specified in config.txt - upload anonymously? (Y/n) " -n 1 -r
-			echo
-				if [[ $REPLY =~ ^[Yy]$ ]]
-				then
-					:
-				else
-					exit
-				fi
-		fi
 		RESULT=$(curl -s -X POST "https://api.wigle.net/api/v2/file/upload" -H "accept: application/json" -u "$WIGLEAPINAME":"$WIGLEAPIKEY" --basic -H "Content-Type: multipart/form-data" -F "file=@$TMPFILE;type=application/zip" -F "donate=on" -A "$USER_AGENT" 2>/dev/null)
 		if (echo $RESULT | grep '"success":true' > /dev/null); then
 			info "Upload succesful" $GUI
