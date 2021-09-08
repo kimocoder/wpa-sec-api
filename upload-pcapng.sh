@@ -138,6 +138,7 @@ wigle_upload ()
 		for FILE in $FILES; do
 			printf "Checking GPS data in $FILE... "
 			if (hcxpcapngtool "$FILE" | grep "NMEA" > /dev/null); then
+				LOCATION="1"
 			 	echo "found"
 			 	hcx_to_wigle "$FILE"
 			 	zip -rvq "$TMPFILE" "$HCX_OUTPUT"
@@ -146,12 +147,14 @@ wigle_upload ()
 			 	echo "not found"
 			fi
 		done
-		info "Uploading files to Wigle.net..." $GUI
-		RESULT=$(curl -s -X POST "https://api.wigle.net/api/v2/file/upload" -H "accept: application/json" -u "$WIGLEAPINAME":"$WIGLEAPIKEY" --basic -H "Content-Type: multipart/form-data" -F "file=@$TMPFILE;type=application/zip" -F "donate=on" -A "$USER_AGENT" 2>/dev/null)
-		if (echo $RESULT | grep '"success":true' > /dev/null); then
-			info "Upload succesful" $GUI
-		else
-			error "Upload failed" $GUI
+		if [[ "$LOCATION" == "1" ]]; then
+			info "Uploading files to Wigle.net..." $GUI
+			RESULT=$(curl -s -X POST "https://api.wigle.net/api/v2/file/upload" -H "accept: application/json" -u "$WIGLEAPINAME":"$WIGLEAPIKEY" --basic -H "Content-Type: multipart/form-data" -F "file=@$TMPFILE;type=application/zip" -F "donate=on" -A "$USER_AGENT" 2>/dev/null)
+			if (echo $RESULT | grep '"success":true' > /dev/null); then
+				info "Upload succesful" $GUI
+			else
+				error "Upload failed" $GUI
+			fi
 		fi
 	fi
 }
