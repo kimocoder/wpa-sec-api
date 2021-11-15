@@ -106,7 +106,7 @@ hcx_to_wigle ()
 
 	# Insert values from actual csv
 
-	awk 'BEGIN { FS = "\t" } ; { print $3","$4","$5$6","$1" "$2","$9","$10","$15","$16","$20",0,WIFI" }' "$TMPFILE" >> "$FILENAME"
+	awk 'BEGIN { FS = "\t" } ; $12=="S" {$15=-$15} $14=="W" {$16=-$16} { print $3","$4","$5$6","$1" "$2","$9","$10","$15","$16","$20",0,WIFI" }' "$TMPFILE" >> "$FILENAME"
 
 	HCX_OUTPUT="$FILENAME"
 
