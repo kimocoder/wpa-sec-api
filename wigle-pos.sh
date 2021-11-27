@@ -35,11 +35,14 @@ if [[ $1 == "" ]]; then
 	exit
 fi
 
-if [[ $2 == "" ]]; then
-	:
+if [[ $2 != "-s" ]]; then
+	if [[ $2 != "" ]]; then
+		FILENAME=$2
+	fi
 else
-	FILENAME=$2
+	echo "Saving networks without Wigle data..."
 fi
+
 
 save_file ()
 {
@@ -52,22 +55,27 @@ save_file ()
 		PSK=$(echo "$line" | cut -d ":" -f 3)
 		SSID=$(echo "$line" | cut -d ":" -f 2)
 		PARSEDMAC=$(echo "$FILEMAC" | sed -e 's/[0-9A-Fa-f]\{2\}/&:/g' -e 's/:$//')
-		APICONTENT=$(curl -s -H 'Accept:application/json' -u "$WIGLEAPINAME":"$WIGLEAPIKEY" --basic "https://api.wigle.net/api/v2/network/detail?netid=$PARSEDMAC")
-		echo -e "\e[1A\e[KSaving networks to $FILENAME... ($CURRENT_LINE/$WC_LINES) - [$SSID]"
-		if ( echo "$APICONTENT" | grep 'too many queries today' ); then
-			echo -e "\e[91mERROR\e[0m: API query limit reached"
-			echo "Saving unlocated networks to $FILENAME.left"
-			tail -n +$CURRENT_LINE "$1" >> "$FILENAME".left
-			exit
-		fi
-		if ( echo "$APICONTENT" | grep '{"success":false,' > /dev/null ); then
+		if [[ $2 == "-s" ]]; then
 			echo "null;null;$PARSEDMAC;$SSID;$PSK" >> "$FILENAME"
 			((CURRENT_LINE=CURRENT_LINE+1))
 		else
-			WIGLETRILAT=$(echo "$APICONTENT" | jq '.results[0].trilat')
-			WIGLETRILONG=$(echo "$APICONTENT" | jq '.results[0].trilong')
-			echo "$WIGLETRILAT;$WIGLETRILONG;$PARSEDMAC;$SSID;$PSK" >> "$FILENAME"
-			((CURRENT_LINE=CURRENT_LINE+1))
+			APICONTENT=$(curl -s -H 'Accept:application/json' -u "$WIGLEAPINAME":"$WIGLEAPIKEY" --basic "https://api.wigle.net/api/v2/network/detail?netid=$PARSEDMAC")
+			echo -e "\e[1A\e[KSaving networks to $FILENAME... ($CURRENT_LINE/$WC_LINES) - [$SSID]"
+			if ( echo "$APICONTENT" | grep 'too many queries today' ); then
+				echo -e "\e[91mERROR\e[0m: API query limit reached"
+				echo "Saving unlocated networks to $FILENAME.left"
+				tail -n +$CURRENT_LINE "$1" >> "$FILENAME".left
+				exit
+			fi
+			if ( echo "$APICONTENT" | grep '{"success":false,' > /dev/null ); then
+				echo "null;null;$PARSEDMAC;$SSID;$PSK" >> "$FILENAME"
+				((CURRENT_LINE=CURRENT_LINE+1))
+			else
+				WIGLETRILAT=$(echo "$APICONTENT" | jq '.results[0].trilat')
+				WIGLETRILONG=$(echo "$APICONTENT" | jq '.results[0].trilong')
+				echo "$WIGLETRILAT;$WIGLETRILONG;$PARSEDMAC;$SSID;$PSK" >> "$FILENAME"
+				((CURRENT_LINE=CURRENT_LINE+1))
+			fi
 		fi
 	done
 }
@@ -77,10 +85,10 @@ read -p "$FILENAME already exists, do you want to append to it? (Y/n) " -n 1 -r
 echo
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
-		save_file "$1"
+		save_file "$1" "$2"
 	else
 		exit
 	fi
 else
-save_file "$1"
+save_file "$1" "$2"
 fi
